@@ -33,7 +33,6 @@ class CreateUsersAndShifts extends Migration
 			$table->float( 'break', 8, 2 );
 			$table->dateTime( 'start_time' );
 			$table->dateTime( 'end_time' );
-			$table->enum( 'role', ['employee', 'manager'] );
 			$table->timestamps( );
 			
 			$table->index( [ 'start_time', 'end_time' ] );
