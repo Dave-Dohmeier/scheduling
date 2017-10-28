@@ -19,12 +19,14 @@ $router->get('/', function () use ($router) {
 $router->group( [ 'prefix' => 'api' ], function ( ) use ( $router ) { 
 
 	//API does not support authentication so simulating user identification
-	$router->group( [ 'prefix' => 'u/{userId:\d+}', 'middleware' => 'auth' ], 
-	function ( ) use ( $router ) {
+	$router->group( [ 
+		'prefix' => 'u/{userId:\d+}',
+		'middleware' => 'auth',
+		'namespace' => '\\App\\Scheduler\\Http\\Controllers' ],
+		function ( ) use ( $router ) {
 
-		//Simple route to get shifts
-		$router->get( 'shifts', function ( $userId ) {
-			return "Shifts: " . $userId;
+		$router->group( [ 'prefix' => 'work' ], function ( ) use ( $router ) {
+			$router->get( 'shifts', [ 'uses' => 'WorkController@when' ] );
 		});
 	});
 });
