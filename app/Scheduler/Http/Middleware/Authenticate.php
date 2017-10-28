@@ -15,7 +15,7 @@ class Authenticate extends \App\Http\Middleware\Authenticate {
 	 * @param  string|null  $guard
 	 * @return mixed
 	**/
-	public function handle( $request, Closure $next, $guard = null ) {
+	public function handle ( $request, Closure $next, $guard = null ) {
 
 		if ( $request->user( ) == null ) {
 			return response( 'Unauthorized.', 401 );
