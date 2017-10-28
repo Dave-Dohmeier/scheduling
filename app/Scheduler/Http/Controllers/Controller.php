@@ -9,6 +9,7 @@ use App\Scheduler\Http;
 
 class Controller extends \App\Http\Controllers\Controller {
 
+	protected $dateValidation  =  'date_format:"' . \DateTime::RFC2822 . '"';
 
 	protected function employeeAuth ( User $user ) {
 

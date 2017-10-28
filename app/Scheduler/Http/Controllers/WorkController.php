@@ -31,4 +31,28 @@ class WorkController extends Controller {
 
 		return Http\ApiResponse::ok( $shifts );
 	}
+
+
+	public function with ( Request $request ) {
+
+		$user      =  $request->user( );
+		$response  =  $this->employeeAuth( $user );
+		if ( $response ) {
+			return $response;
+		}
+
+		$result = $this->validate( $request, [
+			'start_time' => "required|{$this->dateValidation}",
+			'end_time'   => "required|{$this->dateValidation}",
+		],
+		[ 'date_format' => 'The :attribute is not in valid RFC 2822 format.' ] );
+		
+		app( )->log->info( $result );
+
+
+		$start = $request->json( )->get( 'start_time' );
+		$end   = $request->json( )->get( 'end_time' );
+
+		return Http\ApiResponse::ok( 'hi?' );
+	}
 }

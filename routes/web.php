@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Http\Request;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -27,6 +29,13 @@ $router->group( [ 'prefix' => 'api' ], function ( ) use ( $router ) {
 
 		$router->group( [ 'prefix' => 'work' ], function ( ) use ( $router ) {
 			$router->get( 'shifts', [ 'uses' => 'WorkController@when' ] );
+			$router->get( 'with', [ 'uses' => 'WorkController@with' ], function (Request $request) {
+				$rez = $this->validate( $request, [
+					'name' => 'required',
+					'email' => 'required|email|unique:users'
+				]);
+				app( )->log->info( $rez );
+			});
 		});
 	});
 });
