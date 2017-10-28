@@ -14,3 +14,17 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+//API will run on a simple api endpoint (no versioning)
+$router->group( [ 'prefix' => 'api' ], function ( ) use ( $router ) { 
+
+	//API does not support authentication so simulating user identification
+	$router->group( [ 'prefix' => 'u/{userId:\d+}', 'middleware' => 'auth' ], 
+	function ( ) use ( $router ) {
+
+		//Simple route to get shifts
+		$router->get( 'shifts', function ( $userId ) {
+			return "Shifts: " . $userId;
+		});
+	});
+});
