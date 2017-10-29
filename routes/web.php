@@ -28,8 +28,12 @@ $router->group( [ 'prefix' => 'api' ], function ( ) use ( $router ) {
 		function ( ) use ( $router ) {
 
 		$router->group( [ 'prefix' => 'work' ], function ( ) use ( $router ) {
-			$router->get( 'shifts', [ 'uses' => 'WorkController@when' ] );
+			$router->get( 'when', [ 'uses' => 'WorkController@when' ] );
 			$router->get( 'with/{shiftId:\d+}', [ 'uses' => 'WorkController@with' ] );
+			$router->get( 'summary', [ 'uses' => 'WorkController@summary' ] );
+		});
+		$router->group( [ 'prefix' => 'schedule' ], function ( ) use ( $router ) {
+			$router->get( 'list', [ 'uses' => 'ScheduleController@list' ] );
 		});
 	});
 });

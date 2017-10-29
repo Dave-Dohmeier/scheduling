@@ -7,43 +7,128 @@ use App\Scheduler\Http;
 use App\Scheduler\Model\User;
 use App\Scheduler\Model\Shift;
 
-class WorkController extends Controller {
+class ScheduleController extends Controller {
 
 	/**
-	 * Employees can view all upcoming shifts:
-	 * Current shift and future shifts.  Completed shifts are not
-	 * displayed.  Each shift indicates the manager for that shift
-	 * and their contact information.
+	 * Managers can list all shifts between a time range:
+	 * start_date and end_date are required in RFC 2822 format.
 	 *
 	 * @param  Request  $request
 	 * @return Response
 	 */
-	public function when ( Request $request ) {
+	public function list ( Request $request ) {
 
 		$user      =  $request->user( );
-		$response  =  $this->employeeAuth( $user );
+		$response  =  $this->managerAuth( $user );
 		if ( $response ) {
 			return $response;
 		}
-		
-		$shifts  =  Shift::join( 'users', function ( $join ) {
-			$join->on( 'shifts.manager_id', '=', 'users.id' );
-		})
-		->select( 'shifts.*', 'users.name', 'users.phone', 'users.email' )
-		->where( 'employee_id', $user->id )
-		->where( 'end_time', '>', (new \DateTime( 'now' )) )
-		->orderBy( 'end_time' )->get( );
 
-		$result = [];
+		$result = $this->validate( $request, [
+			'start_time' => "required|{$this->dateValidation}",
+			'end_time'   => "required|{$this->dateValidation}",
+		],
+		[ 'date_format' => 'The :attribute is not in valid RFC 2822 format.' ] );
+
+		$start  =  new \DateTime( $request->input( 'start_time' ) );
+		$end    =  new \DateTime( $request->input( 'end_time' ) );
+
+
+		$shifts  =  Shift::join( 'users as e', 'shifts.employee_id', '=', 'e.id' )
+			->join( 'users as m', 'shifts.employee_id', '=', 'm.id' )
+			->select( 
+				'shifts.*',
+				'e.name as employee_name',
+				'e.phone as employee_phone',
+				'e.email as employee_email',
+				'm.name as manager_name',
+				'm.phone as manager_phone',
+				'm.email as manager_email'
+		    )
+		->where( 'start_time', '>=', $start )
+		->where( 'start_time', '<', $end )
+		->orWhere( function ( $query ) use ( $start, $end ) {
+			$query->where( 'end_time', '>', $start )
+				  ->where( 'end_time', '=<', $end );
+		})->get( );
+
+		$entries = [];
 		foreach ( $shifts as $shift ) {
 			$entry = [];
 			$entry['id']          =  $shift->id;
 			$entry['start_time']  =  $shift->start_time->format( \DateTime::RFC2822 );
 			$entry['end_time']    =  $shift->end_time->format( \DateTime::RFC2822 );
-			$entry['manager']     =  [ 'name' => $shift->name, 'email' => $shift->email, 'phone' => $shift->phone ];
-			$result[]  =  $entry;
+			$entry['manager']     =  [ 
+				'id'    => $shift->manager_id,
+				'name'  => $shift->manager_name,
+				'email' => $shift->manager_email,
+				'phone' => $shift->manager_phone
+			];
+			$entry['employee']     =  [ 
+				'id'    => $shift->employee_id,
+				'name'  => $shift->employee_name,
+				'email' => $shift->employee_email,
+				'phone' => $shift->employee_phone
+			];
+			$entries[]  =  $entry;
 		}
-		return Http\ApiResponse::ok( $result );
+		return Http\ApiResponse::ok( $entries );
+	}
+
+
+	/**
+	 * Managers can list all employees
+	 *
+	 * @param  Request  $request
+	 * @return Response
+	 */
+	public function employees ( Request $request ) {
+
+		$user      =  $request->user( );
+		$response  =  $this->managerAuth( $user );
+		if ( $response ) {
+			return $response;
+		}
+
+		$shifts  =  Shift::join( 'users as e', 'shifts.employee_id', '=', 'e.id' )
+			->join( 'users as m', 'shifts.employee_id', '=', 'm.id' )
+			->select( 
+				'shifts.*',
+				'e.name as employee_name',
+				'e.phone as employee_phone',
+				'e.email as employee_email',
+				'm.name as manager_name',
+				'm.phone as manager_phone',
+				'm.email as manager_email'
+		    )
+		->where( 'start_time', '>=', $start )
+		->where( 'start_time', '<', $end )
+		->orWhere( function ( $query ) use ( $start, $end ) {
+			$query->where( 'end_time', '>', $start )
+				  ->where( 'end_time', '=<', $end );
+		})->get( );
+
+		$entries = [];
+		foreach ( $shifts as $shift ) {
+			$entry = [];
+			$entry['id']          =  $shift->id;
+			$entry['start_time']  =  $shift->start_time->format( \DateTime::RFC2822 );
+			$entry['end_time']    =  $shift->end_time->format( \DateTime::RFC2822 );
+			$entry['manager']     =  [ 
+				'id'    => $shift->manager_id,
+				'name'  => $shift->manager_name,
+				'email' => $shift->manager_email,
+				'phone' => $shift->manager_phone
+			];
+			$entry['employee']     =  [ 
+				'id'    => $shift->employee_id,
+				'name'  => $shift->employee_name,
+				'email' => $shift->employee_email,
+				'phone' => $shift->employee_phone
+			];
+			$entries[]  =  $entry;
+		}
+		return Http\ApiResponse::ok( $entries );
 	}
 
 
