@@ -22,6 +22,12 @@ class UsersTableSeeder extends Seeder
 			'name' => 'Ralph',
 			'role'  => User::ROLE_EMPLOYEE,
 			'email' => 'ralph@fakewiw.com'
+		]);
+
+		User::create([
+			'name' => 'Toby',
+			'role'  => User::ROLE_EMPLOYEE,
+			'email' => 'toby@fakewiw.com'
 		]);	
 	}
 }

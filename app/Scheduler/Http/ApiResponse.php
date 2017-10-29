@@ -30,4 +30,9 @@ class ApiResponse {
 
 		return self::error( 401, $message );
 	}
+
+	public static function missing ( $message = 'Not Found' ) {
+
+		return self::error( 404, $message );
+	}
 }
