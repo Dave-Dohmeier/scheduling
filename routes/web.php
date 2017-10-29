@@ -24,19 +24,21 @@ $router->group( [ 'prefix' => 'api' ], function ( ) use ( $router ) {
 	$router->group( [ 
 		'prefix' => 'u/{userId:\d+}',
 		'middleware' => 'auth',
-		'namespace' => '\\App\\Scheduler\\Http\\Controllers' ],
-		function ( ) use ( $router ) {
+		'namespace' => '\\App\\Scheduler\\Http\\Controllers' ], function ( ) use ( $router ) {
 
-		$router->group( [ 'prefix' => 'work' ], function ( ) use ( $router ) {
-			$router->get( 'when', [ 'uses' => 'WorkController@when' ] );
-			$router->get( 'with/{shiftId:\d+}', [ 'uses' => 'WorkController@with' ] );
-			$router->get( 'summary', [ 'uses' => 'WorkController@summary' ] );
-		});
-		$router->group( [ 'prefix' => 'schedule' ], function ( ) use ( $router ) {
-			$router->get( 'shift/list', [ 'uses' => 'ScheduleController@list' ] );
-			$router->get( 'employees/list', [ 'uses' => 'ScheduleController@employees' ] );
-			$router->post( 'shift', [ 'uses' => 'ScheduleController@add' ] );
-			$router->put( 'shift', [ 'uses' => 'ScheduleController@modify' ] );
-		});
+			//Route grouping for employees to query when they work
+			$router->group( [ 'prefix' => 'work' ], function ( ) use ( $router ) {
+				$router->get( 'when', [ 'uses' => 'WorkController@when' ] );
+				$router->get( 'with/{shiftId:\d+}', [ 'uses' => 'WorkController@with' ] );
+				$router->get( 'summary', [ 'uses' => 'WorkController@summary' ] );
+			});
+
+			//Route grouping for shift mamangers to manage the schedule
+			$router->group( [ 'prefix' => 'schedule' ], function ( ) use ( $router ) {
+				$router->get( 'shift/list', [ 'uses' => 'ScheduleController@list' ] );
+				$router->get( 'employee/list', [ 'uses' => 'ScheduleController@employees' ] );
+				$router->post( 'shift', [ 'uses' => 'ScheduleController@add' ] );
+				$router->put( 'shift', [ 'uses' => 'ScheduleController@modify' ] );
+			});
 	});
 });
