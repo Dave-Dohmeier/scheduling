@@ -25,4 +25,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 		'phone'
 	];
 
+	protected function serializeDate( \DateTimeInterface $date ) {
+		return $date->format( \DateTime::RFC2822 );
+	}
+
 }

@@ -91,20 +91,6 @@ class WorkController extends Controller {
 			$entries[]  =  $entry;
 		}
 		return Http\ApiResponse::ok( [ 'id' => $shift->id, 'with' => $entries ] );
-		/*
-		$result = $this->validate( $request, [
-			'start_time' => "required|{$this->dateValidation}",
-			'end_time'   => "required|{$this->dateValidation}",
-		],
-		[ 'date_format' => 'The :attribute is not in valid RFC 2822 format.' ] );
-
-		$start  =  $request->input( 'start_time' );
-		$end    =  $request->input( 'end_time' );
-		
-		app( )->log->info( $shiftId );
-
-		return Http\ApiResponse::ok( 'hi?' );
-		 */
 	}
 
 

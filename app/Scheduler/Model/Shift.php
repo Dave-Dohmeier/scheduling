@@ -19,4 +19,7 @@ class Shift extends Model {
 		'end_time'
 	];
 
+	protected function serializeDate( \DateTimeInterface $date ) {
+		return $date->format( \DateTime::RFC2822 );
+	}
 }

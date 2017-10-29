@@ -33,7 +33,10 @@ $router->group( [ 'prefix' => 'api' ], function ( ) use ( $router ) {
 			$router->get( 'summary', [ 'uses' => 'WorkController@summary' ] );
 		});
 		$router->group( [ 'prefix' => 'schedule' ], function ( ) use ( $router ) {
-			$router->get( 'list', [ 'uses' => 'ScheduleController@list' ] );
+			$router->get( 'shift/list', [ 'uses' => 'ScheduleController@list' ] );
+			$router->get( 'employees/list', [ 'uses' => 'ScheduleController@employees' ] );
+			$router->post( 'shift', [ 'uses' => 'ScheduleController@add' ] );
+			$router->put( 'shift', [ 'uses' => 'ScheduleController@modify' ] );
 		});
 	});
 });

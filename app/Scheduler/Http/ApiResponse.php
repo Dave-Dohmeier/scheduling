@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Scheduler\Http;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApiResponse {
 
@@ -8,7 +9,7 @@ class ApiResponse {
 
 	}
 
-	public static function ok ( $data, $message = 'success', $status = 200 ) {
+	public static function ok ( $data, $message = 'success', $status = Response::HTTP_OK ) {
 
 		return response( )->json( 
 			[ 'data' => $data, 'message' => $message ],
@@ -16,23 +17,34 @@ class ApiResponse {
 		);
 	}
 
-	public static function error ( $status, $message ) {
+	public static function error ( $status, $message, $data = null ) {
 
-		return response( )->json( [ 'message' => $message ], $status );
+		if ( $data === null ) {
+			return response( )->json( [ 'message' => $message ], $status );
+		}
+		return response( )->json( 
+			[ 'data' => $data, 'message' => $message ],
+			$status 
+		);
 	}
 
 	public static function forbid ( $message = 'Forbidden' ) {
 
-		return self::error( 403, $message );
+		return self::error( Response::HTTP_FORBIDDEN, $message );
 	}
 
 	public static function notAuth ( $message = 'Unauthorized' ) {
 
-		return self::error( 401, $message );
+		return self::error( Response::HTTP_UNAUTHORIZED, $message );
 	}
 
 	public static function missing ( $message = 'Not Found' ) {
 
-		return self::error( 404, $message );
+		return self::error( Response::HTTP_NOT_FOUND, $message );
+	}
+
+	public static function invalid ( $data, $message = 'Invalid' ) {
+
+		return self::error( Response::HTTP_UNPROCESSABLE_ENTITY, $message, $data );
 	}
 }
