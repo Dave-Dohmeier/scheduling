@@ -44,13 +44,8 @@ class ScheduleController extends Controller {
 				'm.name as manager_name',
 				'm.phone as manager_phone',
 				'm.email as manager_email'
-		    )
-		->where( 'start_time', '>=', $start )
-		->where( 'start_time', '<', $end )
-		->orWhere( function ( $query ) use ( $start, $end ) {
-			$query->where( 'end_time', '>', $start )
-				  ->where( 'end_time', '=<', $end );
-		})->get( );
+		    );
+		$shifts  =  $this->addOverlap( $shifts, $start, $end )->get( );
 
 		$entries = [];
 		foreach ( $shifts as $shift ) {
@@ -98,7 +93,7 @@ class ScheduleController extends Controller {
 
 
 	/**
-	 * Managers can list all employees
+	 * Managers can create a new shift.
 	 *
 	 * @param  Request  $request
 	 * @return Response
@@ -127,7 +122,7 @@ class ScheduleController extends Controller {
 		$employee  =  User::find( $employeeId );
 		if ( ! $employee ) {
 			return Http\ApiResponse::invalid( 
-				[ 'employee_id' => 'Employee could not be located' ]
+				[ 'employee_id' => 'Employee could not be located.' ]
 			);
 		}
 
@@ -137,13 +132,8 @@ class ScheduleController extends Controller {
 			);
 		}
 
-		$overlap = Shift::where( 'employee_id', '=', $employee->id )
-		->where( 'start_time', '>=', $start )
-		->where( 'start_time', '<', $end )
-		->orWhere( function ( $query ) use ( $start, $end ) {
-			$query->where( 'end_time', '>', $start )
-				  ->where( 'end_time', '=<', $end );
-		})->first( );
+		$overlap  =  Shift::where( 'employee_id', '=', $employee->id );
+		$overlap  =  $this->addOverlap( $overlap, $start, $end )->first( );
 
 		if( $overlap ) {
 			return Http\ApiResponse::invalid( 
@@ -162,4 +152,86 @@ class ScheduleController extends Controller {
 		return Http\ApiResponse::ok( $shift->toArray( ) );
 	}
 
+
+	/**
+	 * Managers can modify an existing shift
+	 *
+	 * @param  Request  $request
+	 * @return Response
+	 */
+	public function modify ( Request $request ) {
+
+		$user      =  $request->user( );
+		$response  =  $this->managerAuth( $user );
+		if ( $response ) {
+			return $response;
+		}
+
+		$result = $this->validate( $request, [
+			'shift_id'     =>  "nullable|integer",
+			'start_time'   =>  "nullable|{$this->dateValidation}",
+			'end_time'     =>  "nullable|{$this->dateValidation}",
+			'employee_id'  =>  "nullable|integer",
+		],
+		[ 'date_format' => 'The :attribute is not in valid RFC 2822 format.' ] );
+
+		$shift  =  Shift::find( $request->input( 'shift_id' ) );
+		if ( ! $shift ) {
+			return Http\ApiResponse::invalid( 
+				[ 'shift_id' => 'Shift could not be located.' ]
+			);
+		}
+
+		if ( $request->input( 'start_time' ) ) {
+			$shift->start_time = new \DateTime( $request->input( 'start_time' ) );
+		}
+		if ( $request->input( 'end_time' ) ) {
+			$shift->start_time = new \DateTime( $request->input( 'end_time' ) );
+		}
+		if ( $request->input( 'employee_id' ) ) {
+			$employee  =  User::find( $request->input( 'employee_id' ) );
+			if ( ! $employee ) {
+				return Http\ApiResponse::invalid( 
+					[ 'employee_id' => 'Employee could not be located.' ]
+				);
+			}
+
+			$shift->employee_id  =  $employee->id;
+		}
+
+		//Unclear if we should update the manager Id here?  Lets go ahead and do it
+		$shift->manager_id  =  $user->id;
+
+		//Verfy that there will not be a scheduling conflict for a different shift
+		$overlap = Shift::where( 'employee_id', '=', $employee->id )
+		->where( 'id', '<>', $shift->id );
+		$overlap  =  $this->addOverlap( $overlap, $shift->start_time, $shift->end_time )->first( );
+
+		if( $overlap ) {
+			return Http\ApiResponse::invalid( 
+				[ 'conflict' => 'Employee has a scheduling conflict with the provided time range.' ]
+			);
+		}
+		
+		$shift->save( );
+
+		return Http\ApiResponse::ok( $shift->toArray( ) );
+	}
+
+
+	protected function addOverlap ( $query, \DateTime $start, \DateTime $end ) {
+
+		$query->where( function ( $query ) use ( $start, $end ) {
+			$query->where( function ( $query ) use ( $start, $end ) {
+				$query->where( 'start_time', '>=', $start )
+					->where( 'start_time', '<', $end );
+			})
+			->orWhere( function ( $query ) use ( $start, $end ) {
+				$query->where( 'end_time', '>', $start )
+					->where( 'end_time', '=<', $end );
+			});
+		});
+
+		return $query;
+	}
 }
