@@ -1,0 +1,448 @@
+
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foundation for Sites</title>
+    <link rel="stylesheet" href="assets/css/app.css">
+  </head>
+  <body>
+
+    <div class="grid-container">
+    	<div class="grid-x grid-margin-x">
+    		<div class="large-12 cell">
+    			<h1>WIW Demo API</h1>
+    		</div>
+    	</div> 
+    
+    	<div class="grid-x grid-margin-x">
+    		<div class="large-12 cell">
+    			<div class="callout">
+    				<h3>Project Reference Documentation</h3>
+    				<p>
+    				<a target="_blank" href="https://github.com/wheniwork/standards/blob/master/project.md">https://github.com/wheniwork/standards/blob/master/project.md</a>
+    				</p>
+    				<h3>Submitted Source Code</h3>
+    				<p>
+    				<a target="_blank" href="https://github.com/Dave-Dohmeier/scheduling">https://github.com/Dave-Dohmeier/scheduling</a>
+    				</p>
+    				<h3>Environment Reference</h3>
+    				<p>
+    				The project code uses the <a target="_blank" href="https://lumen.laravel.com/">Lumen Micro-Framework</a> and is currently running on a manually configured <a target="_blank" href="https://lemp.io/">LEMP Stack</a> on an EC2 instance. To manually install the project please configure a compatible environment or Laravel Homestead. See <a target="_blank" href="https://lumen.laravel.com/docs/5.5/installation">Installation Instructions</a> for a lumen project.
+    				</p>
+    				<p>Please feel free to use the <a href="#api-reference">Hosted API Endpoint</a> to test.</p>
+    				<h3>Sourcecode Roadmap</h3>
+    				<p>Most of the code for the project has been namespaced under <code>App/Scheduler</code> to break it out from the framework codebase.</p>
+    				<p>
+    				<div class="grid-x">
+    					<div class="cell small-2 def-label">
+    						<strong>Routing Logic</strong>
+    					</div>
+    					<div class="cell small-10 def-value">
+    						<a target="_blank" href="https://github.com/Dave-Dohmeier/scheduling/blob/master/routes/web.php">./routes/web.php</a>
+    					</div>
+    					<div class="cell small-2 def-label">
+    						<strong>Schema Design</strong>
+    					</div>
+    					<div class="cell small-10 def-value">
+    						<a target="_blank" href="https://github.com/Dave-Dohmeier/scheduling/blob/master/database/migrations/2017_10_27_172639_create-users-and-shifts.php">./database/migrations/2017_10_27_172639_create-users-and-shifts.php</a>
+    					</div>
+    					<div class="cell small-2 def-label">
+    						<strong>Database Seeding</strong>
+    					</div>
+    					<div class="cell small-10 def-value">
+    						<a target="_blank" href="https://github.com/Dave-Dohmeier/scheduling/tree/master/database/seeds">./database/seeds/</a>
+    					</div>
+    					<div class="cell small-2 def-label">
+    						<strong>Custom App Logic</strong>
+    					</div>
+    					<div class="cell small-10 def-value">
+    						<a target="_blank" href="https://github.com/Dave-Dohmeier/scheduling/tree/master/app/Scheduler/">./app/Scheduler/</a>
+    					</div>
+    				</div>
+    				</p>
+    				<h3 id="api-reference">API Reference</h3>
+    				<h4>Authentication</h4>
+    				<p>The demo API is not designed to implement session or token based authentication. To simulate user permissions the API requires a user ID in the path: <code>http://wiw.eng.mn/api/u/1/</code> to simulate accessing the API as user ID 1.</p>
+    				<hr>
+    				<ul>
+    					<li>As an employee, I want to know when I am working, by being able to see all of the shifts assigned to me.</li>
+    					<li>As an employee, I want to be able to contact my managers, by seeing manager contact information for my shifts.</li>
+    				</ul>
+    <ul class="accordion" data-accordion data-allow-all-closed="true">
+    	<li class="accordion-item" data-accordion-item>
+    	<!-- Accordion tab title -->
+    	<a href="#" class="accordion-title">GET /work/when</a>
+    	<div class="accordion-content" data-tab-content>
+    		<dl>
+    		<dt>Notes</dt>
+    		<dd>
+    			<p>Endpoint returns all shifts that have not ended (current shift and future shifts).  It doesn't show past shifts.  Each shift returns the contact information for the manager of that shift and the "id" of the shift.</p>
+    		</dd>
+    		<dt>Sample Call</dt>
+    		<dd>
+    			<pre><code class="bash">$ http --json GET http://wiw.eng.mn/api/u/2/work/when</code></pre>
+    		</dd>
+    		<dt>Response</dt>
+    		<dd>
+    			<pre><code class="json hljs">
+    {
+        &quot;data&quot;: [
+            {
+                &quot;end_time&quot;: &quot;Tue, 31 Oct 2017 03:02:12 +0000&quot;,
+                &quot;id&quot;: 3,
+                &quot;manager&quot;: {
+                    &quot;email&quot;: &quot;bob@fakewiw.com&quot;,
+                    &quot;name&quot;: &quot;Bob&quot;,
+                    &quot;phone&quot;: &quot;&quot;
+                },
+                &quot;start_time&quot;: &quot;Mon, 30 Oct 2017 17:02:12 +0000&quot;
+            },
+            {
+                &quot;end_time&quot;: &quot;Tue, 31 Oct 2017 21:02:12 +0000&quot;,
+                &quot;id&quot;: 5,
+                &quot;manager&quot;: {
+                    &quot;email&quot;: &quot;bob@fakewiw.com&quot;,
+                    &quot;name&quot;: &quot;Bob&quot;,
+                    &quot;phone&quot;: &quot;&quot;
+                },
+                &quot;start_time&quot;: &quot;Tue, 31 Oct 2017 15:02:12 +0000&quot;
+            },
+            {
+                &quot;end_time&quot;: &quot;Thu, 02 Nov 2017 04:02:12 +0000&quot;,
+                &quot;id&quot;: 7,
+                &quot;manager&quot;: {
+                    &quot;email&quot;: &quot;bob@fakewiw.com&quot;,
+                    &quot;name&quot;: &quot;Bob&quot;,
+                    &quot;phone&quot;: &quot;&quot;
+                },
+                &quot;start_time&quot;: &quot;Wed, 01 Nov 2017 21:02:12 +0000&quot;
+            }
+        ],
+        &quot;message&quot;: &quot;success&quot;
+    }
+    			</code></pre>
+    		</dd>
+    	</div>
+    	</li>
+    </ul>
+    				<hr>
+    				<ul>
+    					<li>As an employee, I want to know who I am working with, by being able to see the employees that are working during the same time period as me.</li>
+    				</ul>
+    <ul class="accordion" data-accordion data-allow-all-closed="true">
+    	<li class="accordion-item" data-accordion-item>
+    	<!-- Accordion tab title -->
+    	<a href="#" class="accordion-title">GET /work/with/{shiftId}</a>
+    	<div class="accordion-content" data-tab-content>
+    		<dl>
+    		<dt>Notes</dt>
+    		<dd>
+    			<p>Endpoint returns all shifts with colleagues that overlap with the provided shiftId.</p>
+    		</dd>
+    		<dt>Sample Call</dt>
+    		<dd>
+    			<pre><code class="bash">$ http --json GET http://wiw.eng.mn/api/u/2/work/with/3</code></pre>
+    		</dd>
+    		<dt>Response</dt>
+    		<dd>
+    			<pre><code class="json hljs">
+    {
+        &quot;data&quot;: {
+            &quot;id&quot;: 3,
+            &quot;with&quot;: [
+                {
+                    &quot;email&quot;: &quot;toby@fakewiw.com&quot;,
+                    &quot;end_time&quot;: &quot;Tue, 31 Oct 2017 03:02:12 +0000&quot;,
+                    &quot;name&quot;: &quot;Toby&quot;,
+                    &quot;phone&quot;: &quot;&quot;,
+                    &quot;start_time&quot;: &quot;Mon, 30 Oct 2017 17:02:12 +0000&quot;
+                }
+            ]
+        },
+        &quot;message&quot;: &quot;success&quot;
+    }
+    </code></pre>
+    		</dd>
+    	</div>
+    	</li>
+    </ul>
+    				<hr>
+    				<ul>
+    					<li>As an employee, I want to know how much I worked, by being able to get a summary of hours worked for each week.</li>
+    				</ul>
+    <ul class="accordion" data-accordion data-allow-all-closed="true">
+    	<li class="accordion-item" data-accordion-item>
+    	<!-- Accordion tab title -->
+    	<a href="#" class="accordion-title">GET /work/summary</a>
+    	<div class="accordion-content" data-tab-content>
+    		<dl>
+    		<dt>Notes</dt>
+    		<dd>
+    			<p>Endpoint returns a weekly hours summary for each year and week of the year for shifts that have completed. In progress shifts are not included in the summary.  Any shifts that cross weeks will have the hours credited to the week where the shift ended.</p>
+    		</dd>
+    		<dt>Sample Call</dt>
+    		<dd>
+    			<pre><code class="bash">$ http --json GET http://wiw.eng.mn/api/u/2/work/summary</code></pre>
+    		</dd>
+    		<dt>Response</dt>
+    		<dd>
+    			<pre><code class="json hljs">
+    {
+        &quot;data&quot;: {
+            &quot;2017&quot;: {
+                &quot;44&quot;: 49,
+                &quot;45&quot;: 37,
+                &quot;46&quot;: 38
+            }
+        },
+        &quot;message&quot;: &quot;success&quot;
+    }
+    			</code></pre>
+    		</dd>
+    	</div>
+    	</li>
+    </ul>
+    				<hr>
+    				<ul>
+    					<li>As a manager, I want to contact an employee, by seeing employee details.</li>
+    				</ul>
+    <ul class="accordion" data-accordion data-allow-all-closed="true">
+    	<li class="accordion-item" data-accordion-item>
+    	<!-- Accordion tab title -->
+    	<a href="#" class="accordion-title">GET /schedule/employee/list</a>
+    	<div class="accordion-content" data-tab-content>
+    		<dl>
+    		<dt>Notes</dt>
+    		<dd>
+    			<p>List all available employees and their contact information. (Does not display managers).</p>
+    		</dd>
+    		<dt>Sample Call</dt>
+    		<dd>
+    			<pre><code class="bash">$ http --json GET http://wiw.eng.mn/api/u/1/schedule/employee/list</code></pre>
+    		</dd>
+    		<dt>Response</dt>
+    		<dd>
+    			<pre><code class="json hljs">
+    {
+        &quot;data&quot;: [
+            {
+                &quot;created_at&quot;: &quot;Sun, 29 Oct 2017 16:02:12 +0000&quot;,
+                &quot;email&quot;: &quot;ralph@fakewiw.com&quot;,
+                &quot;id&quot;: 2,
+                &quot;name&quot;: &quot;Ralph&quot;,
+                &quot;phone&quot;: &quot;&quot;,
+                &quot;role&quot;: &quot;employee&quot;,
+                &quot;updated_at&quot;: &quot;Sun, 29 Oct 2017 16:02:12 +0000&quot;
+            },
+            {
+                &quot;created_at&quot;: &quot;Sun, 29 Oct 2017 16:02:12 +0000&quot;,
+                &quot;email&quot;: &quot;toby@fakewiw.com&quot;,
+                &quot;id&quot;: 3,
+                &quot;name&quot;: &quot;Toby&quot;,
+                &quot;phone&quot;: &quot;&quot;,
+                &quot;role&quot;: &quot;employee&quot;,
+                &quot;updated_at&quot;: &quot;Sun, 29 Oct 2017 16:02:12 +0000&quot;
+            }
+        ],
+        &quot;message&quot;: &quot;success&quot;
+    }
+    			</code></pre>
+    		</dd>
+    	</div>
+    	</li>
+    </ul>
+    				<hr>
+    				<ul>
+    					<li>As a manager, I want to see the schedule, by listing shifts within a specific time period.</li>
+    				</ul>
+    <ul class="accordion" data-accordion data-allow-all-closed="true">
+    	<li class="accordion-item" data-accordion-item>
+    	<!-- Accordion tab title -->
+    	<a href="#" class="accordion-title">GET /schedule/shift/list</a>
+    	<div class="accordion-content" data-tab-content>
+    		<dl>
+    		<dt>Notes</dt>
+    		<dd>
+    			<p>List all shifts that overlap with the provided start and end times.  Employee and manager contact information are included for each shift.</p>
+    		</dd>
+    		<dt>Params</dt>
+    		<dd>
+    			<ul>
+    				<li><code>start_time</code> RFC2822 Date Format</li>
+    				<li><code>end_time</code> RFC2822 Date Format</li>
+    			</ul>
+    		</dd>
+    		<dt>Sample Call</dt>
+    		<dd>
+    			<pre><code class="bash">$ http GET http://wiw.eng.mn/api/u/1/schedule/shift/list start_time=='Sun, 29 Oct 2017 17:55:01 +0000' end_time=='Mon, 30 Oct 2017 17:54:50 +0000'</code></pre>
+    		</dd>
+    		<dt>Response</dt>
+    		<dd>
+    			<pre><code class="json hljs">
+    {
+        &quot;data&quot;: [
+            {
+                &quot;employee&quot;: {
+                    &quot;email&quot;: &quot;toby@fakewiw.com&quot;,
+                    &quot;id&quot;: 3,
+                    &quot;name&quot;: &quot;Toby&quot;,
+                    &quot;phone&quot;: &quot;&quot;
+                },
+                &quot;end_time&quot;: &quot;Tue, 31 Oct 2017 00:02:12 +0000&quot;,
+                &quot;id&quot;: 4,
+                &quot;manager&quot;: {
+                    &quot;email&quot;: &quot;toby@fakewiw.com&quot;,
+                    &quot;id&quot;: 1,
+                    &quot;name&quot;: &quot;Toby&quot;,
+                    &quot;phone&quot;: &quot;&quot;
+                },
+                &quot;start_time&quot;: &quot;Mon, 30 Oct 2017 17:02:12 +0000&quot;
+            },
+            {
+                &quot;employee&quot;: {
+                    &quot;email&quot;: &quot;ralph@fakewiw.com&quot;,
+                    &quot;id&quot;: 2,
+                    &quot;name&quot;: &quot;Ralph&quot;,
+                    &quot;phone&quot;: &quot;&quot;
+                },
+                &quot;end_time&quot;: &quot;Tue, 31 Oct 2017 03:02:12 +0000&quot;,
+                &quot;id&quot;: 3,
+                &quot;manager&quot;: {
+                    &quot;email&quot;: &quot;ralph@fakewiw.com&quot;,
+                    &quot;id&quot;: 1,
+                    &quot;name&quot;: &quot;Ralph&quot;,
+                    &quot;phone&quot;: &quot;&quot;
+                },
+                &quot;start_time&quot;: &quot;Mon, 30 Oct 2017 17:02:12 +0000&quot;
+            }
+        ],
+        &quot;message&quot;: &quot;success&quot;
+    }
+    			</code></pre>
+    		</dd>
+    	</div>
+    	</li>
+    </ul>
+    				<hr>
+    				<ul>
+    					<li>As a manager, I want to schedule my employees, by creating shifts for any employee.</li>
+    				</ul>
+    <ul class="accordion" data-accordion data-allow-all-closed="true">
+    	<li class="accordion-item" data-accordion-item>
+    	<!-- Accordion tab title -->
+    	<a href="#" class="accordion-title">POST /schedule/shift</a>
+    	<div class="accordion-content" data-tab-content>
+    		<dl>
+    		<dt>Notes</dt>
+    		<dd>
+    			<p>Schedule and employee for a shift.</p>
+    		</dd>
+    		<dt>Params</dt>
+    		<dd>
+    			<ul>
+    				<li><code>start_time</code> RFC2822 Date Format</li>
+    				<li><code>end_time</code> RFC2822 Date Format</li>
+    				<li><code>employee_id</code> Integer</li>
+    				<li><code>break</code> Float (optional)</li>
+    			</ul>
+    		</dd>
+    		<dt>Sample Call</dt>
+    		<dd>
+    			<pre><code class="bash">$ http --json POST http://wiw.eng.mn/api/u/1/schedule/shift start_time=='Tue, 06 Feb 2018 20:48:14 +0000' end_time=='Wed, 07 Feb 2018 20:48:23 +0000' employee_id==2</code></pre>
+    		</dd>
+    		<dt>Response</dt>
+    		<dd>
+    			<pre><code class="json hljs">
+    {
+        &quot;data&quot;: {
+            &quot;break&quot;: 0,
+            &quot;created_at&quot;: &quot;Mon, 30 Oct 2017 21:59:17 +0000&quot;,
+            &quot;employee_id&quot;: 2,
+            &quot;end_time&quot;: &quot;Wed, 07 Feb 2018 20:48:23 +0000&quot;,
+            &quot;id&quot;: 42,
+            &quot;manager_id&quot;: 1,
+            &quot;start_time&quot;: &quot;Tue, 06 Feb 2018 20:48:14 +0000&quot;,
+            &quot;updated_at&quot;: &quot;Mon, 30 Oct 2017 21:59:17 +0000&quot;
+        },
+        &quot;message&quot;: &quot;success&quot;
+    }
+    			</code></pre>
+    		</dd>
+    	</div>
+    	</li>
+    </ul>
+    				<hr>
+    				<ul>
+    					<li>As a manager, I want to be able to change a shift, by updating the time details.</li>
+    					<li>As a manager, I want to be able to assign a shift, by changing the employee that will work a shift.</li>
+    				</ul>
+    <ul class="accordion" data-accordion data-allow-all-closed="true">
+    	<li class="accordion-item" data-accordion-item>
+    	<!-- Accordion tab title -->
+    	<a href="#" class="accordion-title">PUT /schedule/shift</a>
+    	<div class="accordion-content" data-tab-content>
+    		<dl>
+    		<dt>Notes</dt>
+    		<dd>
+    			<p>Modify a shift by updating the employee working or start and end times. Modying the shift for a different manager will assign the manager making the change as the new manager.</p>
+    		</dd>
+    		<dt>Params</dt>
+    		<dd>
+    			<ul>
+    				<li><code>shift_id</code> Integer</li>
+    				<li><code>start_time</code> RFC2822 Date Format (optional)</li>
+    				<li><code>end_time</code> RFC2822 Date Format (optional)</li>
+    				<li><code>employee_id</code> Integer (optional)</li>
+    			</ul>
+    		</dd>
+    		<dt>Sample Call</dt>
+    		<dd>
+    			<pre><code class="bash">$ http --json PUT http://wiw.eng.mn/api/u/1/schedule/shift start_time=='Tue, 06 Feb 2018 20:48:14 +0000' end_time=='Wed, 07 Feb 2018 20:48:24 +0000' employee_id==2 shift_id==41</code></pre>
+    		</dd>
+    		<dt>Response</dt>
+    		<dd>
+    			<pre><code class="json hljs">
+    {
+        &quot;data&quot;: {
+            &quot;break&quot;: 0,
+            &quot;created_at&quot;: &quot;Mon, 30 Oct 2017 21:59:17 +0000&quot;,
+            &quot;employee_id&quot;: 2,
+            &quot;end_time&quot;: &quot;Wed, 07 Feb 2018 20:48:23 +0000&quot;,
+            &quot;id&quot;: 42,
+            &quot;manager_id&quot;: 1,
+            &quot;start_time&quot;: &quot;Tue, 06 Feb 2018 20:48:14 +0000&quot;,
+            &quot;updated_at&quot;: &quot;Mon, 30 Oct 2017 21:59:17 +0000&quot;
+        },
+        &quot;message&quot;: &quot;success&quot;
+    }
+    			</code></pre>
+    		</dd>
+    	</div>
+    	</li>
+    </ul>
+    				<h3>Utility Reference &mdash; RFC 2822</h3>
+    				<p>
+    				<dl>
+    					<dt>Today</dt>
+    					<dl>
+    						<pre><code class="bash">php -r 'echo (new DateTime())-&gt;modify( &quot;+0 day&quot; )-&gt;format( DateTime::RFC2822 ) . &quot;\n&quot;;'</code></pre>
+    					</dl>
+    					<dt>Tomorrow</dt>
+    					<dl>
+    						<pre><code class="bash">php -r 'echo (new DateTime())-&gt;modify( &quot;+1 day&quot; )-&gt;format( DateTime::RFC2822 ) . &quot;\n&quot;;'</code></pre>
+    					</dl>
+    				</p>
+    			</div>
+    		</div>
+    	</div>
+    </div>
+    
+    
+    
+
+    <script src="assets/js/app.js"></script>
+  </body>
+</html>
