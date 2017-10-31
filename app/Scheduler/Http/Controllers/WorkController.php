@@ -117,8 +117,8 @@ class WorkController extends Controller {
 			return $response;
 		}
 
-		$shifts  =  Shift::where( 'employee_id', $user->id )
-			->where( 'end_time', '>', (new \DateTime( 'now' )) )
+		$shifts  =  Shift::where( 'employee_id', '=', $user->id )
+			->where( 'end_time', '<', (new \DateTime( 'now' )) )
 			->orderBy( 'end_time' )->get( );
 
 		$report = [];
