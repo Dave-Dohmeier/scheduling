@@ -4,6 +4,11 @@ use Illuminate\Database\Seeder;
 use App\Scheduler\Model\User;
 use App\Scheduler\Model\Shift;
 
+/**
+ * Seed the shifts table.  Expects users to exist already.
+ *
+ * @author Dave Dohmeier <david.dohmeier@gmail.com>
+ **/
 class ShiftsTableSeeder extends Seeder
 {
 	/**

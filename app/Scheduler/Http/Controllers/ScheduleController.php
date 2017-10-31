@@ -7,6 +7,14 @@ use App\Scheduler\Http;
 use App\Scheduler\Model\User;
 use App\Scheduler\Model\Shift;
 
+
+/**
+ * Scheduling Control Class.  Provides functionality
+ * for roles responsable for assigning and managing shifts.
+ *
+ * @package \App\Scheduler\Http\Controllers
+ * @author Dave Dohmeier <david.dohmeier@gmail.com>
+ **/
 class ScheduleController extends Controller {
 
 	/**
@@ -148,13 +156,14 @@ class ScheduleController extends Controller {
 			'start_time' => $start,
 			'end_time' => $end
 		]);
+		app( )->log->info( "New Shift Id({$shift->id}) created by Manager Id({$user->id})." );
 
 		return Http\ApiResponse::ok( $shift->toArray( ) );
 	}
 
 
 	/**
-	 * Managers can modify an existing shift
+	 * Managers can modify an existing shift.
 	 *
 	 * @param  Request  $request
 	 * @return Response
@@ -214,24 +223,9 @@ class ScheduleController extends Controller {
 		}
 		
 		$shift->save( );
+		app( )->log->info( "Shift Id({$shift->id}) modified by Manager Id({$user->id})." );
 
 		return Http\ApiResponse::ok( $shift->toArray( ) );
 	}
 
-
-	protected function addOverlap ( $query, \DateTime $start, \DateTime $end ) {
-
-		$query->where( function ( $query ) use ( $start, $end ) {
-			$query->where( function ( $query ) use ( $start, $end ) {
-				$query->where( 'start_time', '>=', $start )
-					->where( 'start_time', '<', $end );
-			})
-			->orWhere( function ( $query ) use ( $start, $end ) {
-				$query->where( 'end_time', '>', $start )
-					->where( 'end_time', '=<', $end );
-			});
-		});
-
-		return $query;
-	}
 }

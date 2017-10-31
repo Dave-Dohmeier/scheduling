@@ -7,6 +7,14 @@ use App\Scheduler\Http;
 use App\Scheduler\Model\User;
 use App\Scheduler\Model\Shift;
 
+/**
+ * Work Control Class.  Provides functionality
+ * for finding out when you are working and who
+ * you are working with.
+ *
+ * @package \App\Scheduler\Http\Controllers
+ * @author Dave Dohmeier <david.dohmeier@gmail.com>
+ **/
 class WorkController extends Controller {
 
 	/**
@@ -51,6 +59,7 @@ class WorkController extends Controller {
 	 * Allow Employees to see who they are working with on a given shift.
 	 *
 	 * @param  Request  $request
+	 * @param  int  $shiftId
 	 * @return Response
 	 */
 	public function with ( Request $request, $shiftId ) {
@@ -72,13 +81,8 @@ class WorkController extends Controller {
 			$join->on( 'shifts.employee_id', '=', 'users.id' );
 			$join->where( 'shifts.employee_id', '<>', $user->id );
 		})
-		->select( 'shifts.*', 'users.name', 'users.phone', 'users.email' )
-		->where( 'start_time', '>=', $shift->start_time )
-		->where( 'start_time', '<', $shift->end_time )
-		->orWhere( function ( $query ) use ( $shift ) {
-			$query->where( 'end_time', '>', $shift->start_time )
-				  ->where( 'end_time', '=<', $shift->end_time );
-		})->get( );
+		->select( 'shifts.*', 'users.name', 'users.phone', 'users.email' );
+		$withShifts  =  $this->addOverlap( $withShifts, $shift->start_time, $shift->end_time )->get( );
 
 		$entries = [];
 		foreach ( $withShifts as $withShift ) {
@@ -133,7 +137,6 @@ class WorkController extends Controller {
 			else {
 				$report[ $year ][ $week ]  +=  $hours;
 			}
-			app( )->log->info( print_r( [ $hours, $year, $week ], true ) );
 		}
 
 		return Http\ApiResponse::ok( $report );

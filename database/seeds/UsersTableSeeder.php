@@ -3,6 +3,11 @@
 use Illuminate\Database\Seeder;
 use App\Scheduler\Model\User;
 
+/**
+ * Seed the users table.
+ *
+ * @author Dave Dohmeier <david.dohmeier@gmail.com>
+ **/
 class UsersTableSeeder extends Seeder
 {
 	/**
